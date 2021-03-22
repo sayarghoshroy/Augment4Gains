@@ -1,0 +1,24 @@
+Test Results Format: [Accuracy, Macro Average, Weighted Average] percentages
+
+Maximum Number of Tokens = 256
+
+Base Encoder: bert-base-uncased
+
+Data: Gab (No Augment)
+- Results: 92, 92, 92
+- Training time: 01:00:20
+
+Data: Reddit (No Augment)
+- Results: 92, 89, 92
+- Training time: 01:00:20
+
+
+Base Encoder: roberta-base
+
+Data: Gab (No Augment)
+- Results: 92, 92, 92
+- Training time: 00:39:48
+
+Data: Reddit (No Augment)
+- Results: 92, 89, 92
+- Training time: 00:40:19
