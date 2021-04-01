@@ -63,7 +63,10 @@ def main(args):
             with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
                 i2w = dataset.get_i2w()
                 w2i = dataset.get_w2i()      
-                f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
+                f.write('\n'.join(["".format(orig, aug) for orig, aug in zip(
+                    idx2word(batch['inputs'], i2w=i2w, pad_idx=w2i['<pad>']),
+                    idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])
+                )]) + '\n')
     else:
         samples, z = model.inference(n=args.num_samples)
         with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
