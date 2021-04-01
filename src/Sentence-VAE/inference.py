@@ -70,6 +70,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--label', type=int, nargs='+')
+    parser.add_argument('--min_occ', type=int, default=1)
     parser.add_argument('-c', '--load_checkpoint', type=str)
     parser.add_argument('-n', '--num_samples', type=int, default=10)
     parser.add_argument('-pp', '--paraphrase', action='store_true')
