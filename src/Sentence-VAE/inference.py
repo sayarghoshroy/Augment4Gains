@@ -60,7 +60,7 @@ def main(args):
             logp, mean, logv, z = model(batch['input'], batch['length'])
             samples, _ = model.inference(z=z)
             with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
-                f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
+                f.write('\n'.join(["{}\t{}".format(orig, aug) for orig, aug in zip(idx2word(batch['input'], i2w=i2w, pad_idx=w2i['<pad>']), idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>']))])) + '\n')
     else:
         samples, z = model.inference(n=args.num_samples)
         with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     parser.add_argument('-pp', '--paraphrase', action='store_true')
     parser.add_argument('-dd', '--data_dir', type=str, default='data')
     parser.add_argument('-af', '--augments_file', type=str)
-    parser.add_argument('-ms', '--max_sequence_length', type=int, default=50)
+    parser.add_argument('-ms', '--max_sequence_length', type=int, default=128)
     parser.add_argument('-eb', '--embedding_size', type=int, default=300)
     parser.add_argument('-rnn', '--rnn_type', type=str, default='gru')
     parser.add_argument('-hs', '--hidden_size', type=int, default=256)
