@@ -5,20 +5,19 @@ import argparse
 
 from model import SentenceVAE
 from utils import to_var, idx2word, interpolate
+from hate_speech_data import HSDataset
 
 
 def main(args):
-    with open(args.data_dir+'/ptb.vocab.json', 'r') as file:
-        vocab = json.load(file)
+    dataset = HSDataset('train', args)
 
-    w2i, i2w = vocab['w2i'], vocab['i2w']
 
     model = SentenceVAE(
-        vocab_size=len(w2i),
-        sos_idx=w2i['<sos>'],
-        eos_idx=w2i['<eos>'],
-        pad_idx=w2i['<pad>'],
-        unk_idx=w2i['<unk>'],
+        vocab_size=len(dataset.get_w2i()),
+        sos_idx=dataset.sos_idx(),
+        eos_idx=dataset.eos_idx(),
+        pad_idx=dataset.pad_idx(),
+        unk_idx=dataset.unk_idx(),
         max_sequence_length=args.max_sequence_length,
         embedding_size=args.embedding_size,
         rnn_type=args.rnn_type,
@@ -41,16 +40,31 @@ def main(args):
     
     model.eval()
 
-    samples, z = model.inference(n=args.num_samples)
-    print('----------SAMPLES----------')
-    print(*idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>']), sep='\n')
+    if args.paraphrase:
+        data_loader = DataLoader(
+                    dataset=dataset,
+                    batch_size=args.batch_size,
+                    shuffle=False,
+                    num_workers=cpu_count(),
+                    pin_memory=torch.cuda.is_available()
+                )
 
-    z1 = torch.randn([args.latent_size]).numpy()
-    z2 = torch.randn([args.latent_size]).numpy()
-    z = to_var(torch.from_numpy(interpolate(start=z1, end=z2, steps=8)).float())
-    samples, _ = model.inference(z=z)
-    print('-------INTERPOLATION-------')
-    print(*idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>']), sep='\n')
+        for iteration, batch in enumerate(data_loader):
+            batch_size = batch['input'].size(0)
+
+            for k, v in batch.items():
+                if torch.is_tensor(v):
+                    batch[k] = to_var(v)
+
+            # Forward pass
+            logp, mean, logv, z = model(batch['input'], batch['length'])
+            samples, _ = model.inference(z=z)
+            with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
+                f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
+    else:
+        samples, z = model.inference(n=args.num_samples)
+        with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
+            f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
 
 
 if __name__ == '__main__':
@@ -58,8 +72,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-c', '--load_checkpoint', type=str)
     parser.add_argument('-n', '--num_samples', type=int, default=10)
-
+    parser.add_argument('-pp', '--paraphrase', action='store_true')
     parser.add_argument('-dd', '--data_dir', type=str, default='data')
+    parser.add_argument('-af', '--augments_file', type=str)
     parser.add_argument('-ms', '--max_sequence_length', type=int, default=50)
     parser.add_argument('-eb', '--embedding_size', type=int, default=300)
     parser.add_argument('-rnn', '--rnn_type', type=str, default='gru')

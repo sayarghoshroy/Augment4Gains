@@ -23,8 +23,6 @@ def main(args):
     datasets = OrderedDict()
     for split in splits:
         datasets[split] = HSDataset(split, args)
-    
-    return
 
     params = dict(
         vocab_size=datasets['train'].vocab_size,

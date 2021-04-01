@@ -21,7 +21,10 @@ class HSDataset(Dataset):
         self.data_file = "vae_preprocessed_{}.json".format(split)
         self.vocab_file = 'vae_preprocessed_vocab.json'
 
-        self._create_data(os.path.join(args.data_dir, "{}.json".format(split)))
+        if not os.path.exists(os.path.join(self.data_dir, self.data_file)):
+            self._create_data(os.path.join(args.data_dir, "{}.json".format(split)))
+        else:
+            self._load_data()
 
     def __len__(self):
         return len(self.data)
