@@ -91,7 +91,7 @@ class HSDataset(Dataset):
         with open(dataset_path, 'r') as file:
             dataset = json.load(file)
             for i, sample in enumerate(dataset):
-                if not sample['target'] == self.label:
+                if not sample['target'] in self.label:
                     continue
                 words = sample['source'].split()
 
@@ -136,7 +136,7 @@ class HSDataset(Dataset):
         with open(dataset_path, 'r') as file:
             dataset = json.load(file)
             for i, sample in enumerate(dataset):
-                if not sample['target'] == self.label:
+                if not sample['target'] in self.label:
                     continue
                 words = sample['source'].split()
                 w2c.update(words)
