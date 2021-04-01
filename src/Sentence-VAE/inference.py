@@ -3,10 +3,11 @@ import json
 import torch
 import argparse
 
+from multiprocessing import cpu_count
 from model import SentenceVAE
 from utils import to_var, idx2word, interpolate
 from hate_speech_data import HSDataset
-
+from torch.utils.data import DataLoader
 
 def main(args):
     dataset = HSDataset('train', args)
@@ -14,10 +15,10 @@ def main(args):
 
     model = SentenceVAE(
         vocab_size=len(dataset.get_w2i()),
-        sos_idx=dataset.sos_idx(),
-        eos_idx=dataset.eos_idx(),
-        pad_idx=dataset.pad_idx(),
-        unk_idx=dataset.unk_idx(),
+        sos_idx=dataset.sos_idx,
+        eos_idx=dataset.eos_idx,
+        pad_idx=dataset.pad_idx,
+        unk_idx=dataset.unk_idx,
         max_sequence_length=args.max_sequence_length,
         embedding_size=args.embedding_size,
         rnn_type=args.rnn_type,
@@ -60,10 +61,14 @@ def main(args):
             logp, mean, logv, z = model(batch['input'], batch['length'])
             samples, _ = model.inference(z=z)
             with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
+                i2w = dataset.get_i2w()
+                w2i = dataset.get_w2i()      
                 f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
     else:
         samples, z = model.inference(n=args.num_samples)
         with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
+            i2w = dataset.get_i2w()
+            w2i = dataset.get_w2i()
             f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
 
 
@@ -79,6 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('-ms', '--max_sequence_length', type=int, default=50)
     parser.add_argument('-eb', '--embedding_size', type=int, default=300)
     parser.add_argument('-rnn', '--rnn_type', type=str, default='gru')
+    parser.add_argument('-bs','--batch_size', type=int, default=32)
     parser.add_argument('-hs', '--hidden_size', type=int, default=256)
     parser.add_argument('-wd', '--word_dropout', type=float, default=0)
     parser.add_argument('-ed', '--embedding_dropout', type=float, default=0.5)
