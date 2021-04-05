@@ -1,0 +1,8 @@
+numpy
+torch
+transformers
+datasets
+protobuf
+pandas
+scikit_learn
+simpletransformers

@@ -30,6 +30,7 @@ arguments = []
 for index in range(1, count):
     arguments.append(str(sys.argv[index]))
 
+print('List of arguments: ')
 print(arguments)
 
 try:

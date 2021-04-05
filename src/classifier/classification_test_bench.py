@@ -15,11 +15,11 @@ import numpy as np
 import pickle
 import shutil
 
-# from simpletransformers.classification import ClassificationModel, ClassificationArgs
-# from sklearn.metrics import classification_report
-# import simpletransformers
-# import logging
-# import pandas as pd
+from simpletransformers.classification import ClassificationModel, ClassificationArgs
+from sklearn.metrics import classification_report
+import simpletransformers
+import logging
+import pandas as pd
 
 with open('./config.json', 'r+') as f:
   mappings = json.load(f)
@@ -150,7 +150,7 @@ model_name = model_loc + '_' + data_name + '_' + str(length_setting)
 cache_name = model_name + '_cache_dir'
 
 batch_size = 32
-num_epochs = 4
+num_epochs = 8
 num_gpus = 4
 
 if global_testing_mode == 1:
@@ -220,6 +220,12 @@ if infer_now == True:
   print('Results on the test split: ')
   test_predictions, test_outputs = model.predict(test_sources)
   print(classification_report(test_targets, test_predictions, digits = 6))
+
+remove_backup = True
+if remove_backup == True:
+  os.system('rm -rf ' + cache_name)
+  os.system('rm -rf ' + model_name)
+  os.system('rm -rf outputs')
 
 compress_model = False
 if compress_model == True:
