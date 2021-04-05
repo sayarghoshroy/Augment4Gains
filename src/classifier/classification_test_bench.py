@@ -100,6 +100,7 @@ def create_set(set_name = 'train'):
 
   if set_name == 'train' and is_augment == 1:
     work_on = raw_aug
+    data_size = len(work_on)
     for index in range(data_size):
       unit = [work_on[index]['source'], work_on[index]['target']]
       data.append(unit)
@@ -120,14 +121,21 @@ for unit in train:
 print('Number of positive samples: ' + str(positive_in_train))
 print('Number of negative samples: ' + str(total_in_train - positive_in_train))
 
-# Weights to correct the class imbalance
-greater_class_count = max((total_in_train - positive_in_train), positive_in_train)
-class_weights = [greater_class_count / (total_in_train - positive_in_train),
-                 greater_class_count / positive_in_train]
-
 if correct_imbalance == 0:
   # Disabling weighing of classes
   class_weights = [1, 1]
+
+elif correct_imbalance == 1:
+  # Weights to correct the class imbalance
+  # First Method
+  greater_class_count = max((total_in_train - positive_in_train), positive_in_train)
+  class_weights = [greater_class_count / (total_in_train - positive_in_train),
+                   greater_class_count / positive_in_train]
+else:
+  # Weights to correct the class imbalance
+  # Second Method
+  class_weights = [total_in_train / (2 * (total_in_train - positive_in_train)),
+                   total_in_train / (2 * positive_in_train)]
 
 # Defining dataframes
 train_df = pd.DataFrame(train)
@@ -149,8 +157,8 @@ length_setting = 256
 model_name = model_loc + '_' + data_name + '_' + str(length_setting)
 cache_name = model_name + '_cache_dir'
 
-batch_size = 32
-num_epochs = 8
+batch_size = 128
+num_epochs = 4
 num_gpus = 4
 
 if global_testing_mode == 1:

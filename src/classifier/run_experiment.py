@@ -30,8 +30,8 @@ arguments = []
 for index in range(1, count):
     arguments.append(str(sys.argv[index]))
 
-print('List of arguments: ')
-print(arguments)
+print('List of arguments: ', flush = True)
+print(arguments, flush = True)
 
 try:
   for index in range(len(arguments)):
