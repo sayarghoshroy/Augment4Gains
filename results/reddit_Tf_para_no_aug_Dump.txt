@@ -1,0 +1,136 @@
+Tf_paraphrase:
+
+CUDA is available: True
+PyTorch version: 1.8.1+cu102
+Number of Samples in: 
+• train: 15619
+• val: 2231
+• test: 4464
+• augment: 15207
+Number of positive samples: 7249
+Number of negative samples: 23577
+
+Using Model: bert-base-uncased_tf_para_reddit_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.950059  0.948665  0.949362      3409
+           1   0.834906  0.838863  0.836879      1055
+
+    accuracy                       0.922715      4464
+   macro avg   0.892482  0.893764  0.893120      4464
+weighted avg   0.922844  0.922715  0.922778      4464
+
+
+Using Model: bert-base-uncased_tf_para_reddit_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.964442  0.907011  0.934845      3409
+           1   0.748013  0.891943  0.813662      1055
+
+    accuracy                       0.903450      4464
+   macro avg   0.856227  0.899477  0.874253      4464
+weighted avg   0.913292  0.903450  0.906205      4464
+
+Using Model: bert-base-uncased_tf_para_reddit_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.960999  0.925198  0.942759      3409
+           1   0.784264  0.878673  0.828789      1055
+
+    accuracy                       0.914203      4464
+   macro avg   0.872632  0.901935  0.885774      4464
+weighted avg   0.919231  0.914203  0.915824      4464
+
+Using Model: roberta-base_tf_para_reddit_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.954572  0.943092  0.948797      3409
+           1   0.822993  0.854976  0.838680      1055
+
+    accuracy                       0.922267      4464
+   macro avg   0.888783  0.899034  0.893739      4464
+weighted avg   0.923476  0.922267  0.922773      4464
+
+Using Model: roberta-base_tf_para_reddit_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.965769  0.893811  0.928397      3409
+           1   0.723453  0.897630  0.801184      1055
+
+    accuracy                       0.894713      4464
+   macro avg   0.844611  0.895720  0.864791      4464
+weighted avg   0.908501  0.894713  0.898332      4464
+
+no_aug:
+
+CUDA is available: True
+PyTorch version: 1.8.1+cu102
+Number of Samples in: 
+• train: 15619
+• val: 2231
+• test: 4464
+Number of positive samples: 3666
+Number of negative samples: 11953
+
+Using Model: bert-base-uncased_reddit_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.949267  0.949545  0.949406      3409
+           1   0.836812  0.836019  0.836415      1055
+
+    accuracy                       0.922715      4464
+   macro avg   0.893040  0.892782  0.892911      4464
+weighted avg   0.922690  0.922715  0.922702      4464
+
+
+Using Model: bert-base-uncased_reddit_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.954936  0.944852  0.949867      3409
+           1   0.827681  0.855924  0.841566      1055
+
+    accuracy                       0.923835      4464
+   macro avg   0.891309  0.900388  0.895716      4464
+weighted avg   0.924861  0.923835  0.924272      4464
+
+Using Model: bert-base-uncased_reddit_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.956018  0.943678  0.949808      3409
+           1   0.825296  0.859716  0.842154      1055
+
+    accuracy                       0.923835      4464
+   macro avg   0.890657  0.901697  0.895981      4464
+weighted avg   0.925124  0.923835  0.924366      4464
+
+Using Model: roberta-base_reddit_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.949267  0.949545  0.949406      3409
+           1   0.836812  0.836019  0.836415      1055
+
+    accuracy                       0.922715      4464
+   macro avg   0.893040  0.892782  0.892911      4464
+weighted avg   0.922690  0.922715  0.922702      4464
+
+Using Model: roberta-base_reddit_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.959770  0.930771  0.945048      3409
+           1   0.796200  0.873934  0.833258      1055
+
+    accuracy                       0.917339      4464
+   macro avg   0.877985  0.902353  0.889153      4464
+weighted avg   0.921113  0.917339  0.918628      4464
+
+
