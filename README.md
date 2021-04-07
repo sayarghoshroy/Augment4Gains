@@ -4,4 +4,6 @@
 
 - Processed Datasets with Train, Validation, and Test splits can be found [here](https://drive.google.com/drive/folders/13zFCdnfLcJde0Wd1NDp5lDVXiEmgaRRs?usp=sharing).
 
+- Spreadsheet with evaluation results is being maintained [here](https://docs.google.com/spreadsheets/d/1PgIuUSzB87u2JR-ReamSy5zvLWveY5MnVavTAts9WRg/edit?usp=sharing).
+
 ---
