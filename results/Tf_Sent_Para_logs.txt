@@ -1,0 +1,154 @@
+Gab:
+
+Number of Samples in: 
+• train: 23643
+• val: 3377
+• test: 6756
+• augment: 21617
+Number of positive samples: 19936
+Number of negative samples: 25324
+
+Using Model: roberta-base_tf_sent_para_gab_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.938281  0.929136  0.933686      3796
+           1   0.910244  0.921622  0.915897      2960
+
+    accuracy                       0.925844      6756
+   macro avg   0.924263  0.925379  0.924792      6756
+weighted avg   0.925997  0.925844  0.925892      6756
+
+Using Model: roberta-base_tf_sent_para_gab_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.932283  0.935722  0.933999      3796
+           1   0.917176  0.912838  0.915002      2960
+
+    accuracy                       0.925696      6756
+   macro avg   0.924730  0.924280  0.924501      6756
+weighted avg   0.925664  0.925696  0.925676      6756
+
+
+Using Model: roberta-base_tf_sent_para_gab_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.933229  0.938883  0.936047      3796
+           1   0.921008  0.913851  0.917416      2960
+
+    accuracy                       0.927916      6756
+   macro avg   0.927118  0.926367  0.926731      6756
+weighted avg   0.927874  0.927916  0.927884      6756
+
+Using Model: bert-base-uncased_tf_sent_para_gab_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.931052  0.939146  0.935082      3796
+           1   0.921080  0.910811  0.915916      2960
+
+    accuracy                       0.926732      6756
+   macro avg   0.926066  0.924979  0.925499      6756
+weighted avg   0.926683  0.926732  0.926685      6756
+
+Using Model: bert-base-uncased_tf_sent_para_gab_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.931586  0.936249  0.933911      3796
+           1   0.917715  0.911824  0.914760      2960
+
+    accuracy                       0.925548      6756
+   macro avg   0.924650  0.924037  0.924336      6756
+weighted avg   0.925509  0.925548  0.925521      6756
+
+Using Model: bert-base-uncased_tf_sent_para_gab_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.924129  0.943361  0.933646      3796
+           1   0.925373  0.900676  0.912857      2960
+
+    accuracy                       0.924660      6756
+   macro avg   0.924751  0.922019  0.923252      6756
+weighted avg   0.924674  0.924660  0.924538      6756
+
+Reddit:
+
+Number of Samples in: 
+
+• train: 15619
+• val: 2231
+• test: 4464
+• augment: 15106
+Number of positive samples: 7221
+Number of negative samples: 23504
+
+Using Model: roberta-base_tf_sent_para_reddit_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.962721  0.909064  0.935124      3409
+           1   0.751004  0.886256  0.813043      1055
+
+    accuracy                       0.903674      4464
+   macro avg   0.856863  0.897660  0.874084      4464
+weighted avg   0.912685  0.903674  0.906272      4464
+
+Using Model: roberta-base_tf_sent_para_reddit_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.962848  0.912291  0.936888      3409
+           1   0.757699  0.886256  0.816951      1055
+
+    accuracy                       0.906138      4464
+   macro avg   0.860273  0.899273  0.876919      4464
+weighted avg   0.914364  0.906138  0.908543      4464
+
+Using Model: roberta-base_tf_sent_para_reddit_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.948914  0.948079  0.948496      3409
+           1   0.832703  0.835071  0.833885      1055
+
+    accuracy                       0.921371      4464
+   macro avg   0.890808  0.891575  0.891191      4464
+weighted avg   0.921449  0.921371  0.921409      4464
+
+Using Model: bert-base-uncased_tf_sent_para_reddit_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.961433  0.921385  0.940983      3409
+           1   0.776107  0.880569  0.825044      1055
+
+    accuracy                       0.911738      4464
+   macro avg   0.868770  0.900977  0.883014      4464
+weighted avg   0.917634  0.911738  0.913582      4464
+
+Using Model: bert-base-uncased_tf_sent_para_reddit_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.967836  0.873863  0.918452      3409
+           1   0.689755  0.906161  0.783286      1055
+
+    accuracy                       0.881496      4464
+   macro avg   0.828795  0.890012  0.850869      4464
+weighted avg   0.902116  0.881496  0.886508      4464
+
+Using Model: bert-base-uncased_tf_sent_para_reddit_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.950646  0.949252  0.949949      3409
+           1   0.836792  0.840758  0.838771      1055
+
+    accuracy                       0.923611      4464
+   macro avg   0.893719  0.895005  0.894360      4464
+weighted avg   0.923739  0.923611  0.923673      4464
+
