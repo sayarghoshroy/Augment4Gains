@@ -158,7 +158,7 @@ model_name = model_loc + '_' + data_name + '_' + str(length_setting)
 cache_name = model_name + '_cache_dir'
 
 batch_size = 128
-num_epochs = 4
+num_epochs = 8
 num_gpus = 4
 
 if global_testing_mode == 1:
@@ -229,13 +229,13 @@ if infer_now == True:
   test_predictions, test_outputs = model.predict(test_sources)
   print(classification_report(test_targets, test_predictions, digits = 6))
 
+compress_model = False
+if compress_model == True:
+  shutil.make_archive(model_name, 'zip', model_name)
+  shutil.make_archive(cache_name, 'zip', cache_name)
+
 remove_backup = True
 if remove_backup == True:
   os.system('rm -rf ' + cache_name)
   os.system('rm -rf ' + model_name)
   os.system('rm -rf outputs')
-
-compress_model = False
-if compress_model == True:
-  shutil.make_archive(model_name, 'zip', model_name)
-  shutil.make_archive(cache_name, 'zip', cache_name)

@@ -66,6 +66,17 @@ Tf_paraphrase:
    macro avg   0.844611  0.895720  0.864791      4464
 weighted avg   0.908501  0.894713  0.898332      4464
 
+Using Model: roberta-base_tf_para_reddit_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.968061  0.889117  0.926911      3409
+           1   0.716429  0.905213  0.799832      1055
+
+    accuracy                       0.892921      4464
+   macro avg   0.842245  0.897165  0.863372      4464
+weighted avg   0.908592  0.892921  0.896878      4464
+
 no_aug:
 
 CUDA is available: True
@@ -133,4 +144,13 @@ Tf_paraphrase:
    macro avg   0.877985  0.902353  0.889153      4464
 weighted avg   0.921113  0.917339  0.918628      4464
 
-
+Using Model: roberta-base_reddit_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.957568  0.933412  0.945336      3409
+           1   0.801052  0.866351  0.832423      1055
+
+    accuracy                       0.917563      4464
+   macro avg   0.879310  0.899881  0.888879      4464
+weighted avg   0.920578  0.917563  0.918650      4464
