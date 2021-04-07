@@ -1,0 +1,154 @@
+no aug:
+
+CUDA is available: True
+PyTorch version: 1.8.1+cu102
+Number of Samples in: 
+• train: 23643
+• val: 3377
+• test: 6756
+Number of positive samples: 10194
+Number of negative samples: 13449
+
+Using Model: bert-base-uncased_gab_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.917958  0.952055  0.934695      3796
+           1   0.935438  0.890878  0.912615      2960
+
+    accuracy                       0.925252      6756
+   macro avg   0.926698  0.921467  0.923655      6756
+weighted avg   0.925616  0.925252  0.925021      6756
+
+Using Model: bert-base-uncased_gab_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.924981  0.945205  0.934984      3796
+           1   0.927702  0.901689  0.914511      2960
+
+    accuracy                       0.926140      6756
+   macro avg   0.926342  0.923447  0.924747      6756
+weighted avg   0.926173  0.926140  0.926014      6756
+
+Using Model: bert-base-uncased_gab_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.925219  0.945205  0.935106      3796
+           1   0.927728  0.902027  0.914697      2960
+
+    accuracy                       0.926288      6756
+   macro avg   0.926473  0.923616  0.924901      6756
+weighted avg   0.926318  0.926288  0.926164      6756
+
+Using Model: roberta-base_gab_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.920891  0.947576  0.934043      3796
+           1   0.930175  0.895608  0.912565      2960
+
+    accuracy                       0.924808      6756
+   macro avg   0.925533  0.921592  0.923304      6756
+weighted avg   0.924959  0.924808  0.924633      6756
+
+Using Model: roberta-base_gab_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.927070  0.940991  0.933978      3796
+           1   0.922838  0.905068  0.913867      2960
+
+    accuracy                       0.925252      6756
+   macro avg   0.924954  0.923029  0.923922      6756
+weighted avg   0.925216  0.925252  0.925167      6756
+
+Using Model: roberta-base_gab_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.926741  0.943098  0.934848      3796
+           1   0.925337  0.904392  0.914745      2960
+
+    accuracy                       0.926140      6756
+   macro avg   0.926039  0.923745  0.924796      6756
+weighted avg   0.926126  0.926140  0.926040      6756
+
+Tf_paraphrase:
+
+CUDA is available: True
+PyTorch version: 1.8.1+cu102
+Number of Samples in: 
+• train: 23643
+• val: 3377
+• test: 6756
+• augment: 22896
+Number of positive samples: 20077
+Number of negative samples: 26462
+
+Using Model: bert-base-uncased_tf_para_gab_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.927149  0.932034  0.929585      3796
+           1   0.912245  0.906081  0.909153      2960
+
+    accuracy                       0.920663      6756
+   macro avg   0.919697  0.919057  0.919369      6756
+weighted avg   0.920619  0.920663  0.920633      6756
+
+Using Model: bert-base-uncased_tf_para_gab_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.939024  0.912803  0.925728      3796
+           1   0.892042  0.923986  0.907733      2960
+
+    accuracy                       0.917703      6756
+   macro avg   0.915533  0.918395  0.916731      6756
+weighted avg   0.918440  0.917703  0.917844      6756
+
+Using Model: bert-base-uncased_tf_para_gab_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.941017  0.912013  0.926288      3796
+           1   0.891453  0.926689  0.908730      2960
+
+    accuracy                       0.918443      6756
+   macro avg   0.916235  0.919351  0.917509      6756
+weighted avg   0.919301  0.918443  0.918595      6756
+
+Using Model: roberta-base_tf_para_gab_no_bal_256
+
+              precision    recall  f1-score   support
+
+           0   0.934496  0.932034  0.933263      3796
+           1   0.913131  0.916216  0.914671      2960
+
+    accuracy                       0.925104      6756
+   macro avg   0.923813  0.924125  0.923967      6756
+weighted avg   0.925135  0.925104  0.925117      6756
+
+Using Model: roberta-base_tf_para_gab_bal_1_256
+
+              precision    recall  f1-score   support
+
+           0   0.935904  0.927028  0.931445      3796
+           1   0.907543  0.918581  0.913029      2960
+
+    accuracy                       0.923327      6756
+   macro avg   0.921724  0.922805  0.922237      6756
+weighted avg   0.923479  0.923327  0.923376      6756
+
+Using Model: roberta-base_tf_para_gab_bal_2_256
+
+              precision    recall  f1-score   support
+
+           0   0.935750  0.924658  0.930171      3796
+           1   0.904825  0.918581  0.911651      2960
+
+    accuracy                       0.921995      6756
+   macro avg   0.920288  0.921619  0.920911      6756
+weighted avg   0.922201  0.921995  0.922057      6756
