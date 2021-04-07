@@ -177,7 +177,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--data_dir', type=str, default='data')
-    parser.add_argument('--label', type=int, nargs='+')
+    parser.add_argument('--label', type=int)
     parser.add_argument('--max_sequence_length', type=int, default=128)
     parser.add_argument('--min_occ', type=int, default=1)
     parser.add_argument('--test', action='store_true')

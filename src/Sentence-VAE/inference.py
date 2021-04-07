@@ -42,6 +42,7 @@ def main(args):
     model.eval()
 
     if args.paraphrase:
+        augment = list()
         data_loader = DataLoader(
                     dataset=dataset,
                     batch_size=args.batch_size,
@@ -49,6 +50,9 @@ def main(args):
                     num_workers=cpu_count(),
                     pin_memory=torch.cuda.is_available()
                 )
+
+        i2w = dataset.get_i2w()
+        w2i = dataset.get_w2i()  
 
         for iteration, batch in enumerate(data_loader):
             batch_size = batch['input'].size(0)
@@ -60,24 +64,30 @@ def main(args):
             # Forward pass
             logp, mean, logv, z = model(batch['input'], batch['length'])
             samples, _ = model.inference(z=z)
-            with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
-                i2w = dataset.get_i2w()
-                w2i = dataset.get_w2i()      
-                f.write('\n'.join(["{}\t{}".format(orig, aug) for orig, aug in zip(
-                    idx2word(batch['inputs'], i2w=i2w, pad_idx=w2i['<pad>']),
-                    idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])
-                )]) + '\n')
+            augment.extend([{"source": s, "target": args.label} for s in idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])])
+                # f.write('\n'.join(["{}\t{}".format(orig, aug) for orig, aug in zip(
+                #     idx2word(batch['inputs'], i2w=i2w, pad_idx=w2i['<pad>']),
+                #     idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])
+                # )]) + '\n')
+        with open(os.path.join(args.data_dir, args.augments_file), 'w') as f:
+            json.dump(augment, f)
+
     else:
-        samples, z = model.inference(n=args.num_samples)
+        augment = list()
+        i2w = dataset.get_i2w()
+        w2i = dataset.get_w2i()
+        while len(augment) < args.num_samples:
+            samples, z = model.inference(n=args.batch_size)
+            augment.extend([{"source": s, "target": args.label} for s in idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])])
+
         with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
-            i2w = dataset.get_i2w()
-            w2i = dataset.get_w2i()
-            f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
+            json.dump(augment, f)
+        #     f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--label', type=int, nargs='+')
+    parser.add_argument('--label', type=int)
     parser.add_argument('--min_occ', type=int, default=1)
     parser.add_argument('-c', '--load_checkpoint', type=str)
     parser.add_argument('-n', '--num_samples', type=int, default=10)
