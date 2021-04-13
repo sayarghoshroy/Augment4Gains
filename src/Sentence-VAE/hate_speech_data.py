@@ -35,7 +35,9 @@ class HSDataset(Dataset):
         return {
             'input': np.asarray(self.data[idx]['input']),
             'target': np.asarray(self.data[idx]['target']),
-            'length': self.data[idx]['length']
+            'length': self.data[idx]['length'],
+            'index': self.data[idx]['index'],
+            'label': self.data[idx]['label']
         }
 
     @property
@@ -114,6 +116,8 @@ class HSDataset(Dataset):
                 data[id]['input'] = input
                 data[id]['target'] = target
                 data[id]['length'] = length
+                data[id]['index'] = sample['index']
+                data[id]['label'] = sample['label']
 
         with io.open(os.path.join(self.data_dir, self.data_file), 'wb') as data_file:
             data = json.dumps(data, ensure_ascii=False)
@@ -122,7 +126,7 @@ class HSDataset(Dataset):
         self._load_data(vocab=False)
 
     def _create_vocab(self, dataset_path):
-        assert self.split == 'train', "Vocablurary can only be created for training file."
+        assert self.split == 'train', "Vocabulary can only be created for training file."
 
         w2c = OrderedCounter()
         w2i = dict()
@@ -142,7 +146,7 @@ class HSDataset(Dataset):
                 w2c.update(words)
             
             for w, c in w2c.items():
-                if c > self.min_occ and w not in special_tokens:
+                if c >= self.min_occ and w not in special_tokens:
                     i2w[len(w2i)] = w
                     w2i[w] = len(w2i)
 

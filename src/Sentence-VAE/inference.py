@@ -65,10 +65,7 @@ def main(args):
             logp, mean, logv, z = model(batch['input'], batch['length'])
             samples, _ = model.inference(z=z)
             augment.extend([{"source": s, "target": args.label} for s in idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])])
-                # f.write('\n'.join(["{}\t{}".format(orig, aug) for orig, aug in zip(
-                #     idx2word(batch['inputs'], i2w=i2w, pad_idx=w2i['<pad>']),
-                #     idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])
-                # )]) + '\n')
+
         with open(os.path.join(args.data_dir, args.augments_file), 'w') as f:
             json.dump(augment, f)
 
@@ -79,10 +76,8 @@ def main(args):
         while len(augment) < args.num_samples:
             samples, z = model.inference(n=args.batch_size)
             augment.extend([{"source": s, "target": args.label} for s in idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])])
-
-        with open(os.path.join(args.data_dir, args.augments_file), 'a') as f:
+        with open(os.path.join(args.data_dir, args.augments_file), 'w') as f:
             json.dump(augment, f)
-        #     f.write('\n'.join(idx2word(samples, i2w=i2w, pad_idx=w2i['<pad>'])) + '\n')
 
 
 if __name__ == '__main__':
