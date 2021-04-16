@@ -1,5 +1,5 @@
 # Using a pre-trained Transformer Encoder-Decoder based Paraphraser
- 
+
 import os.path
 from os import path
 import json
@@ -21,12 +21,10 @@ torch_device = 'cuda'
 if torch.cuda.is_available() == False:
   torch_device = 'cpu'
 
-print('Device: ' + str(torch_device), flush = True)
-
 tokenizer = PegasusTokenizer.from_pretrained(tokenizer_model_name)
 model = PegasusForConditionalGeneration.from_pretrained(paraphrasing_model_name).to(torch_device)
 
-def get_unit_paraphrase(input_text, num_return_sequences = 1, num_beams = 10):
+def get_unit_paraphrase(input_text, num_return_sequences = 5, num_beams = 10):
   max_len = 60
   batch = tokenizer([input_text], 
                     truncation = True,
@@ -40,14 +38,14 @@ def get_unit_paraphrase(input_text, num_return_sequences = 1, num_beams = 10):
                               num_return_sequences = num_return_sequences,
                               temperature = 1.5)
   
-  target = tokenizer.batch_decode(translated,
+  targets = tokenizer.batch_decode(translated,
                                   skip_special_tokens = True)
   
-  return target[0]
+  return targets
 
-def get_paraphrase(input_text, num_return_sequences = 2, num_beams = 10):
+def get_paraphrase(input_text, num_return_sequences = 5, num_beams = 10):
   preprocess_len = 52
-  complete_paraphrase = ''
+  complete_paraphrases = ['', '', '', '', '']
 
   sentences = nltk.sent_tokenize(input_text)
   for sentence in sentences:
@@ -56,14 +54,17 @@ def get_paraphrase(input_text, num_return_sequences = 2, num_beams = 10):
     if count > preprocess_len:
       continue
     try:
-      sentence_paraphrase = get_unit_paraphrase(sentence)
+      sentence_paraphrases = get_unit_paraphrase(sentence)
     except:
       continue
-    complete_paraphrase += sentence_paraphrase + ' '
 
-  return complete_paraphrase
+    for index, unit in enumerate(sentence_paraphrases):
+      complete_paraphrases[index] += unit + ' '
+
+  return complete_paraphrases
 
 # Viewing Sample Paraphrases
+
 examples = ['you should watch louis le vau \'s latest video . steven oh of tyt is disturbing as hell and makes me hope that jimmy dore wakes the left up .',
             'kill yourself you whiny , self-righteous faggot .',
             'but why do they make that face']
@@ -71,11 +72,11 @@ examples = ['you should watch louis le vau \'s latest video . steven oh of tyt i
 for example in examples:
   print('Source: ' + str(example))
   response = get_paraphrase(example)
-  print('Primary Paraphrase: ' + str(response))
+  print('Primary Paraphrase: ' + str(response[0]))
   print()
 
 # Generating the Augmented Training Data
-set_type = 'reddit'
+set_type = 'Twitter'
 
 # Reference to the absolute path in Google Drive
 data_path = './' + set_type
@@ -86,7 +87,7 @@ with open(data_path + '/' + 'train.json', 'r+') as f:
 # Getting the Augmented Datapoints
 augmented_data = []
 overwrite_data = True
-save_name = data_path + '/' + 'sent_wise_paraphrased_train.json'
+save_name = data_path + '/' + 'multi_paraphrased_train.json'
 limit = len(raw_train)
 minimum_length = 4
 interval = 500
@@ -94,7 +95,7 @@ interval = 500
 test_mode = False
 if test_mode == True:
   interval = 2
-  limit = 50
+  limit = 25
 
 backup_present = path.isfile(save_name)
 done = 0
@@ -113,23 +114,24 @@ for index in tqdm(range(done, limit)):
 
   try:
     raw_text = str(unit['source'].replace('\n', ' '))
-    target = get_paraphrase(raw_text)
+    targets = get_paraphrase(raw_text)
   except:
     pass
     continue
   
-  token_count = len(nltk.word_tokenize(target))
-  if token_count < minimum_length:
-    continue
-  new_unit = unit.copy()
-  
-  if 'type' in new_unit:
-    new_unit.pop('type')
-  if 'set' in new_unit:
-    new_unit.pop('set')
+  for target in targets:
+    token_count = len(nltk.word_tokenize(target))
+    if token_count < minimum_length:
+      continue
+    new_unit = unit.copy()
+    
+    if 'type' in new_unit:
+      new_unit.pop('type')
+    if 'set' in new_unit:
+      new_unit.pop('set')
 
-  new_unit['source'] = target
-  augmented_data.append(new_unit)
+    new_unit['source'] = target
+    augmented_data.append(new_unit)
 
   if index % interval == 0 and overwrite_data == True:
       with open(save_name, 'w+') as f:
