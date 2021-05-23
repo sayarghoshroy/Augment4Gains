@@ -1,0 +1,88 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{emnlp2020}
+\usepackage{times, graphicx}
+\usepackage{latexsym}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{inconsolata}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{ragged2e}
+\usepackage{blindtext}
+\usepackage{enumitem}
+
+\makeatletter
+\newcommand{\printfnsymbol}[1]{
+  \textsuperscript{\@fnsymbol{#1}}
+}
+\makeatother
+
+\aclfinalcopy
+\def\aclpaperid{0}
+
+\setlength\titlebox{5cm}
+
+\newcommand\BibTeX{B\textsc{ib}\TeX}
+
+\title{{\normalsize Social Computing Project: Scope Document} \vspace{0.15cm} \\ Data Augmentation for Hate Speech Detection}
+
+\author{Sayar Ghosh Roy\thanks{\ \ Equal contribution. Order determined by roll number.} \\ \texttt{20171047} \And
+        Souvik Banerjee\footnotemark[1] \\ \texttt{20171094} \And
+        Saujas Vaduguru\footnotemark[1] \\ \texttt{20171098} \And
+        Ujwal Narayan\footnotemark[1] \\ \texttt{20171170}}
+
+\date{}
+\begin{document}
+\maketitle
+
+\section{Conspectus}
+\justifying
+\noindent
+In this document, we outline the overall scope of our proposed work. Our aim is to investigate approaches to incorporating data augmentation techniques into the task of hate speech detection. 
+
+We plan to utilize two publicly available hate speech detection datasets collected from the Reddit and Gab platforms \cite{benchmark} having binary classification labels for each post. We prefer the use of source text which is grammatical and closer to formal English as compared to the social media style of short texts typically seen in Tweets. We also hope to evaluate our established approaches on a Twitter-based hate speech detection dataset. 
+
+We plan to study the following three promising approaches for data augmentation, namely, (a) Various lexical augmentation methods by \citet{aug2prev}, (b) \citet{cao-lee-2020-hategan}'s reinforcement learning-based HateGANs, and (c) Variational Auto-Encoders for natural language generation by \citet{bowman-etal-2016-generating}, in detail and select two suitable methods from these works as our baselines. We then hope to introduce thought-out variations into our implemented baselines. We produce updated pipelines which leverage data augmentation for hate speech detection. Finally, we will present a thorough analysis of the behaviour of each augmentation technique and how that translates to downstream improvements in the classification performance.
+
+\section{Problem Statement}
+Our primary problem is one of hate speech detection in English. We can formally define the task as: given a piece of text, compute a binary label indicating the presence of hate speech i.e label it as `1' if the text contains at least one instance of hate speech, and else, label it as `0'. There are multiple definitions of hate speech in the existing literature. For our task, we stick to the one \href{https://www.un.org/en/genocideprevention/documents/UN Strategy and Plan of Action on Hate Speech 18 June SYNOPSIS.pdf}{provided by the United Nations} which goes as follows. Hate speech encompasses ``any kind of communication in speech, writing or behaviour, that attacks or uses pejorative or discriminatory language with reference to a person or a group on the basis of who they are, in other words, based on their religion, ethnicity, nationality, race, colour, descent, gender or other identity factor.''
+
+Our problem scope includes the usage of data augmentation techniques to enhance the performance of hate speech detection modules. Based on our literature review, we found two broad classes of approaches for creating additional data which are listed as follows.
+\begin{enumerate}
+\item Alteration-based: These approaches make use of various schemes to perturb token sequences in the existing training data to obtain new sequences \cite{wei-zou-2019-eda}. The perturbations are performed in a way such that class labels remain invariant.
+\item Generation-based: These approaches make use of explicit natural language generation frameworks including but not restricted to variational autoencoders \cite{bowman-etal-2016-generating}, generative adversarial networks \cite{cao-lee-2020-hategan}, and language model-based language generation \cite{aug2prev}.
+\end{enumerate}
+
+We plan to understand, analyze, experiment with two existing data augmentation methods, and propose modifications to derive newer techniques for the data augmentation process. The goal being to produce synthetic natural language data in order to increase the number of training examples for the underlying binary classification machine learning models that use encoded input text representations as features.
+
+\section{Problem Scope}
+Throughout our project, we will only focus on hate speech detection i.e. coarse binary classification of cleaned sequences of tokens as hate speech or not. We will not explore fine-grained multi-class classification based on severity or multi-label classification tasks into classes such as sexism, homophobia, anti-Semitism, and Islamophobia. We select two suitable baseline methods for data augmentation from \citet{aug2prev} and \citet{cao-lee-2020-hategan}, and \citet{bowman-etal-2016-generating}. We plan to establish baselines on the benchmarks we have selected, and introduce certain modifications to our baselines to arrive at newer data augmentation techniques.
+
+We will make the choice of baselines as well as the modifications based on properties (like style, syntax, etc.) of Reddit and Gab posts, which differ from the text typically seen on Twitter. These platforms allow us to explore the applicability of data augmentation methods to hate speech detection in domains with typically longer text and additional context as compared to Tweets \cite{benchmark}. 
+We also plan to evaluate our formulated approaches on a Tweet-based hate speech detection dataset\footnote{\ \url{hasocfire.github.io/hasoc/2019/dataset.html}} \cite{hasoc2019} to understand how our architectures deal with the social media style of short texts, albeit with limited context and reduced grammaticality.
+
+\section{Solution Overview}
+We will utilize only the cleaned natural language (NL) text as our encoder input throughout all our experiments. Tweets typically contain much higher numbers of non-NL tokens such as hashtags, mentions, emojis, reserved words, etc. as compared to Reddit or Gab posts \cite{benchmark} where only a fraction of the posts contain such special tokens. Our lexical data augmentation approaches rely only on NL tokens and we thus make a conscious decision to identify hate conditioned solely on the lexical semantics of a post without considering cues from special tokens such as hashtags.
+
+In recent shared tasks on hate speech detection \cite{Poletto2020ResourcesAB, hasoc2020overview, hasoc2019}, utilizing Transformer models \cite{vaswani2017attention} pretrained using specific Masked Language Modeling (MLM) objectives on large amounts of natural language have proven useful \cite{tapt-tathagata, hasoc-sayar} beating the more traditional encoding techniques techniques based on term-frequencies \cite{gaydhani2018detecting, gitari2015lexicon}, aggregated word vectors \cite{arora2016simple}, and RNNs such as LSTMs and GRUs \cite{badjatiya2017dlhate, Bisht2020}. For our classification architectures, we will experiment with Transformer based text encoder models like BERT \cite{devlin2018bert} and RoBERTa \cite{roberta} with classification heads, fine-tuned upon our datasets.
+
+All our augmentation approaches will leverage datapoints from only the examples within the training splits. This is to ensure that we do not indirectly use a sample from the test set for training our models. New training samples are generated from each implemented augmentation technique and we evaluate the contributions of these synthetic training examples to the overall performance of our classifiers. Lastly, we plan to conduct further studies where multiple augmentation techniques are used in synergy. 
+
+The modifications we plan to explore fall into the two broad classes we mentioned above. Along the lines of alteration-based techniques, we plan to investigate whether WordNet-based\footnote{\ \url{wordnet.princeton.edu}} \cite{wordnet} perturbations can be introduced to create newer samples. 
+
+To investigate generation-based approaches, we also plan to experiment with State-of-the-art Transformer language models in order to extend LM-based generation approaches. More specifically, we would like to incorporate Transformer encoder-decoder models such as BART \cite{bart}, and T5 \cite{T5} into the model workflows in order to leverage the latest advances in large scale language model pretraining. Overall, our experiments with data augmentation can be divided up into the following four sets.
+
+\begin{enumerate}
+    \itemsep-0.3em 
+    \item No augmented samples utilized
+    \item Two existing baseline methods
+    \item Our proposed modifications
+    \item Multiple techniques combined
+\end{enumerate}
+
+\bibliographystyle{acl_natbib}
+\bibliography{emnlp2020}
+
+\end{document}

@@ -1,0 +1,180 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{emnlp2020}
+\usepackage{times, graphicx}
+\usepackage{latexsym}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{ragged2e}
+\usepackage{blindtext}
+\usepackage{enumitem}
+
+\makeatletter
+\newcommand{\printfnsymbol}[1]{
+  \textsuperscript{\@fnsymbol{#1}}
+}
+\makeatother
+
+\aclfinalcopy
+\def\aclpaperid{0}
+
+\setlength\titlebox{5cm}
+
+\newcommand\BibTeX{B\textsc{ib}\TeX}
+
+
+\newcommand\Warning{%
+ \makebox[1.4em][c]{%
+ \makebox[0pt][c]{\raisebox{.1em}{\small!}}%
+ \makebox[0pt][c]{\Large$\bigtriangleup$}}}%
+
+\title{{\normalsize Social Computing Project: Intermediate Report 2} \vspace{0.18cm} \\ Data Augmentation for Hate Speech Detection}
+
+\author{Sayar Ghosh Roy\thanks{\ \ Equal contribution. Order determined by roll number.} \\ \texttt{20171047} \And
+        Souvik Banerjee\footnotemark[1] \\ \texttt{20171094} \And
+        Saujas Vaduguru\footnotemark[1] \\ \texttt{20171098} \And
+        Ujwal Narayan\footnotemark[1] \\ \texttt{20171170}}
+
+\date{}
+\begin{document}
+\maketitle
+
+\Warning This document contains samples of online social media hate speech which are present in the publicly available datasets we are currently studying. These are included for illustrative purposes only and in no way reflect the views of the authors. Please note that these samples are highly derogatory. Reader discretion is advised.
+
+\vspace{4mm}
+\hrule
+\vspace{4mm}
+
+In this document, we will describe our text generation-based approaches to data augmentation for hate speech detection. For details on alteration based approaches, kindly refer to Intermediate Report 1.\\
+
+\hrule
+\vspace{4mm}
+
+Broadly speaking, our approaches to data augmentation can be classified into two major types.
+\begin{enumerate}
+    \item \textbf{Augmentation through perturbation \vspace{1mm}} \\ 
+    In this space, we create new training data by modifying or perturbing the existing training datapoints. The approaches that we discussed in Intermediate Report 1 such as synonym substitution including MLM based augmentation and WordNet based substitutions and methodologies such as Easy Data Augmentation (EDA) \cite{wei-zou-2019-eda} fall under this category. 
+    \item \textbf{Augmentation through generation \vspace{1mm}} \\
+    Within this type of augmentation, we do not modify the existing training data. New training samples are generated from scratch. Approaches including the use of Variational AutoEncoders (VAE) and encoder-decoder models fall under this category. We've made significant progress on this front and would be describing the same through this document. 
+\end{enumerate}
+
+\section*{Augmentation through Generation}
+After exploring alteration-based approaches to augmentation, we turned our attention to generation-based approaches. These methods create augmentation samples on their entirety using specific Natural Language Generation (NLG) models. Now, a generation model may be trained to generate samples belonging to a particular class without any other constraints, or to generate samples that are constrained to `mean' the same thing as a given input sentence. We explore both of these paths.
+
+\subsection*{Class-based generation}
+We present two methods to generate samples constrained only by the class label. The first is a baseline method proposed by \citet{aug2prev} called \texttt{GenAug}, where a language model is trained upon data from a single class and then leveraged to generate samples. The second is an approach not explored in the context of data augmentation for hate-speech detection -- the use of Variational AutoEncoders (VAEs).
+
+% We implement GenAug \cite{feng2020genaug} as our baseline, and plan improvements with two experimental setups
+% \begin{itemize}
+%     \item Augmentation through paraphrase generation
+%     \item Augmentation through VAE 
+% \end{itemize}
+% \subsubsection*{GenAug}
+% GenAug does not augment the training data directly. Rather it explores augmenting the training data for text generators so when these text generators are made to generate new samples, these samples are grammatically correct, and close to the original data.  GenAug leverages OpenAI's GPT-2 \cite{radford2019language} model trained on WebText - a variety of internet data from forums such as Reddit as it's text generator. This model is fine tuned on the training data for the task at hand  and then made to generate new training samples. GenAug then augments the training data for fine-tuning through a variety of operations to get higher quality generations.  The operations performed to augment  are listed below: 
+% \begin{itemize}
+%     \item \textbf{EDA operations} \\ Word level operations such as those followed by EDA \cite{wei-zou-2019-eda} (random insertion, random deletion and random swap).
+%     \item \textbf{Semantic Text Exchange (STE)} \\ STE   \cite{feng-etal-2019-keep} is also used to generate prompts. Here an entity  from the original text is replaced with a related entity. Then phrases that are similar to the original entity are masked and a transformer based model is used to fill in these masked  phrases so that the newly generated phrases are similar to the replacement entity. For example, consider the following sentence. ``It's sunny outside, I must bring sunscreen". We can choose ```sunny" as our original entity and generate ``rainy" as our replacement entity. Now ``sunscreen" is masked as it's related to sunny, and through MLM with the context being provided by substituting the related entity, the mask is filled in with ``an umbrella" thus generating our new prompt. 
+%     \item \textbf{Synthetic Noise} \\ GenAug also introduces synthetic noise to the prompt by performing character level insertion, substitution or swap of two adjacent characters to simulate typos present in the text. This noisy prompt is combined with the original continuation to create the augmentations 
+%     \item \textbf{Keyword replacement} \\ 
+%     Instead of random replacements as done earlier, here the keywords from each data sample is identified and it's replaced with one of it's synonyms, hyponyms or hypernyms. For keyword identification, RAKE \cite{rake} is used. RAKE analyses the frequency of word appearances and it's co occurrences with other words to determine the keywords. 
+    
+% \end{itemize}
+
+\subsection*{Paraphrase generation}
+Paraphrases can be defined as sentences conveying the same meaning but with different surface realizations. In this report, we use ``augmentation through paraphrasing" to only refer to the paraphrases generated from scratch as paraphrases generated through substitutions or replacements have been covered earlier under the banner of ``augmentation through perturbation". Augmentation through perturbation adds extremely similar data samples to the training pool as the generated samples have very similar syntactic structure and text style. By throwing samples that are generated from scratch into the training pool, we expect the trained classifiers to be more robust, and in that, we expect better performance on unseen data.
+
+\section{Class-based generation}
+\subsection{\texttt{GenAug}} 
+The main idea behind GenAug is extremely similar to that of using RNNs (LSTMs/GRUs) for Natural Language Generation. Training such a model is synonymous to training a word level language model. Hence, for making inferences using such models, we start with a random word from the vocabulary and attempt to predict each in-sequence next word based on the generation so far. Our implementation, specifically takes N words as input and converts each into a 100-dimensional word embedding vector. This sequence of vectors is then passed through a bidrectional-LSTM layer with 128 hidden units each. Finally, the output of the bi-LSTM is fed into a final FCNN layer. The final output represents a probability distribution over each token in the vocabulary the argmax of which produces the output token.
+
+\subsection{VAEs} \label{sec:vae_gen}
+We also explore the use of VAEs for generating samples within each class. We adopt the approach presented by \citet{bowman-etal-2016-generating}. The model is trained as an auto-encoder with an encoder function $f_{enc}(x)$ that maps an input $x$ to a learned code $z$, and a decoder function $f_{dec}$ that recovers $x$ from the code $z$. The model is trained to recover the input (with the difference forming one loss term) while keeping the posterior distribution $q(z|x)$ modelled by $f_{enc}$ close to a prior $p$ (with the Kullback-Leibler divergence between $p$ and $q$ forming the second loss term). For the application of text representation learning, the functions $f_{enc}$ and $f_{dec}$ are parameterised as recurrent neural networks.
+
+We train a single VAE model for each class, and then generate samples for each class by sampling a random point $z'$ in the latent space of the model's learned code, and using the decoder to generate a sequence conditioned on $z'$. The intuition being that a model corresponding to a particular class learns a latent space of codes corresponding to the distribution of samples in that particular class. Then, any point in that latent space is the representation of some sample belonging to that class, and we can decode that sample by conditioning on the point in the latent space.
+
+We adapt an implementation of \citet{bowman-etal-2016-generating}\footnote{\url{https://github.com/timbmg/Sentence-VAE}} for our application. Examples of samples generated via class based generation can be found in Table~\ref{tab:ex_class}.
+
+\label{tab:ex_class}
+\begin{table*}
+    \centering
+    \begin{tabular}{lp{0.4\textwidth}p{0.4\textwidth}}
+    \toprule
+    \textbf{Label} & \textbf{\texttt{GenAug}} & \textbf{VAE} \\
+    \midrule
+        0 & depression quest which is why you need to put in a long time. i don't see the biggest mistake of all the time. it 's a huge issue that they can think of the law. However, that's not a case that is just a fucking idiot. & i don't know how to be a hypocrite to be a hypocrite \\
+    \midrule
+        1 & m afraid but i try not to let it affect my relationships and then the victim has a woman, she was doing the same thing with her pussy pass. you 're a cunt . you 're a fucking idiot . i think that's a good thing to be fair, it has a lot of people  &  the study will be a liberal utopia.\\
+    \bottomrule
+    \end{tabular}
+    \caption{Samples obtained using class-based generation methods for augmentation. Label 0 indicates `not hate speech' and label 1 indicates `is hate speech'.}
+    \label{tab:cbaug}
+\end{table*}
+
+\section{Paraphrase generation}
+In order to have a scalable method of generating new labelled samples for hate speech detection, we need to ensure that we can assign a gold standard label to a newly produced sample based on certain heuristics that take the immediate environment of the generation process into account. For example, if we perturb a sentence replacing certain nouns with other synonymous nouns having the same word sense, we do not expect the meaning of the sentence to change and in turn, we can assign the same `is hate-speech' label to the new perturbed sentence. Similarly, a paraphrased version of a given sentence, by definition, will carry the same semantics and have the same level of hateful content as the original sentence.
+
+In this section, we will describe our two proposed data augmentation techniques that aim to generate a paraphrase of the input sequence. The idea is simple: use an encoder that `understands' and produces a latent representation for the input sequence. And then generate a new token sequence relying upon the created latent representation such that the core semantics of the newly produced text remains invariant as compared to the source. In general, this idea differs sharply from that of class-based generation where a specific trained language model is used to generate a sequence conditioned upon a small input prompt.
+
+As a baseline method of generating paraphrases, we consider text-to-text Variational AutoEncoders. Note that VAEs have never been used for creating synthetic data meant for augmenting hate-speech datasets. We present further details on our VAE-based experiments in Section~\ref{sec:VAE} and put it forward as our baseline paraphrase generation technique.
+
+Moving from the unsupervised techniques to our proposed supervised model for paraphrase generation, we leverage publicly available supervised datasets (refer to Section~\ref{sec:Paraphrase_Data}) for generating paraphrases of sequences. We utilize state-of-the-art Transformer based encoder-decoder models which are then fine-tuned on a set of these supervised datasets in order to serve as our paraphraser.
+
+\label{sec:VAE}
+\subsection{Text-to-Text VAEs}
+% Since they are trained as auto-encoders, we can think of a VAE as a model that takes text as input, embeds it, and decodes an approximately similar text from the embedding. A VAE can decode a sentence of approximately similar meaning -- in other words -- a paraphrase.
+A trained VAE plus a decoder can be intuitively thought of as an unsupervised paraphraser because of its functionality — go though an input sequence, create a non-textual representation of its distributional semantics (an embedding) and use the same to produce a new sequence (of approximately similar `meaning'). 
+
+We utilize the same training set up described in Section~\ref{sec:vae_gen} and instead of decoding from a random point in the latent code space, we embed an input sequence in the code space, and decode a sequence of the same (expected) meaning from the embedding.
+
+\subsection{Transformer-based Paraphraser}
+To summarize, we utilize a fully trained Transformer-based sequence to sequence architecture for paraphrase generation. Instead of randomly initializing the Transformer weights prior to fine-tuning, we choose a pre-trained Transformer model that has already `witnessed' and learnt from large chunks of natural language text. Such a pre-trained text-to-text Transformer is then fine-tuned auto-regressively on supervised input-source to paraphrased-target mappings. Like our VAE-decoder models, during inference, we consider the first 128 tokens for each source text and generate sequences having the same figure as maximum length.
+
+\subsubsection{Text to Text Transformers}
+\paragraph{Experiences with T5 \vspace{0.18cm}\\}
+T5 \cite{T5} was one of the first highly acclaimed encoder-decoder Transformer architectures. Its novelty lies in the ability to perform any sequence to sequence natural language processing task using just one trained model by the use of prompts. Thus, in order to translate a sentence from English to French, a prompt\footnote{A colon separates the main input from the prompt.} such as `Translate to french' would work. Similarly, one could have prompts like `Summarize', `Regression', `Classify', `Get parse', and so on. Although intuitive and ambitious, the actual resultant outputs from the pre-trained T5 model do not seem very human-like. Moreover, upon experimenting with T5 models trained on standard paraphrasing datasets, we experienced the issue of polarity reversal. Essentially, a sentence such as `He did not do so' would erratically change to `He did do so' thereby defeating the purpose of writing a paraphrase.
+
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+    \toprule
+        \textbf{Original} & \textbf{VAE-paraphrase} & \textbf{Tf-Paraphraser} \\
+    \midrule
+        % "main_index": 916
+        you should watch louis le vau 's latest video . steven oh of tyt is disturbing as hell and makes me hope that jimmy dore wakes the left up . & good luck , you can get arrested for her to $<unk>$ . she 's a good thing to her , and she 's minding her to the ground . she 's just that she 's a good thing to her . she 's just a $<unk>$ , she 's just going to be honest , but you 're not going to be honest . & louis le vau's latest video is disturbing and makes me hope that jimmy dore wakes the left up. \\ \midrule
+        % "main_index": 3663
+        kill yourself you whiny , self-righteous faggot . & 'm not sure how much they are n't like it. i 'm not gonna be able to be so much as well as well as well as well as well as well as well as well as well as well as well as well as well as well & You are self-righteous and should kill yourself. \\ \midrule
+        % "main_index": 3703
+        but why do they make that face & the video is the same as a whole thing , the only one is the same as the only one who thinks the other party is the same as the $<unk>$ is a good thing to the character . if you 're a great , then the other engages isn't a liberal , and the other option isn't a good thing to the other side of the $<unk>$ & Why do they make that face?\\
+    \bottomrule
+    \end{tabular}
+    \caption{Some samples from the training set along with corresponding augmented versions using VAEs for paraphrasing, and Tf-Paraphraser (Transformer-based Paraphraser)}
+    \label{tab:aug_examples}
+\end{table*}
+
+\paragraph{Briefly reviewing BART and PEGASUS \vspace{0.18cm}\\}
+
+Recently, Facebook's BART \cite{bart} has proven very effective as a pre-trained encoder-decoder Transformer. As opposed to T5, the idea around using BART is to train and store task specific models that generate very high quality data. BART was once the state-of-the-art model for automatic abstractive text summarization and has been applied to domain specific text summarization tasks yielding state-of-the-art results \cite{summaformers}. A more recent venture into the area of text-to-text Transformers was carried out by Google and they released their PEGASUS (Pre-training with Extracted Gap-sentences for Abstractive Summarization) \cite{pegasus} model. Not only did it beat BART, but it also introduced a flavour of versatility being able to work with sequences of varying sizes — ranging from very short sequences right upto large research papers and patent documents. They introduced the concept of sentence masking and experimented with the selection of specific (important) to-be-masked sentences.
+
+\paragraph{Choice of pre-trained Transformer \vspace{0.18cm}\\}
+After manually studying the qualities of various output sentences from these pre-trained Transformer encoder-decoder models, we found that PEGASUS produces the best looking sequences with the least amount of noticeable grammatical errors (something which is corroborated in their publication as well). Therefore, we chose to utilize PEGASUS as our base pre-trained Transformer model for the paraphrasing task. We used Hugging Face's implementation of PEGASUS\footnote{\url{huggingface.co/transformers/model_doc/pegasus.html}} with number of beams for decoding set to 10, a maximum sequence length of 128, with all other hyperparameters set to their default values.
+
+It is also to be noted that paraphrasing and abstractive summarization are both sequence-to-sequence tasks where the semantics of the output sequence does not deviate from that of the input, in that, we do not expect the model to add new information or to alter existing information bits. As opposed to summarization, a paraphraser would ideally not prune out any information pieces while expressing the source sequence in `its own words'. We have shared some examples to illustrate the quality of language generation for our paraphrasing models in Table~\ref{tab:aug_examples}.
+
+\label{sec:Paraphrase_Data}
+\subsubsection{Datasets related to paraphrase generation}
+In this subsection, we will quickly review two publicly available datasets having supervised mappings from source texts to their paraphrases. \texttt{PAWS-Wiki} \cite{paws} contains a collection of sentence pairs sourced from Wikipedia having supervised labels judging whether the two sentences are good paraphrases of each others or not. Similarly, \texttt{PAWS-QQP} contains contains pairs of Quora questions with similar paraphrase-worthiness labels. PAWS\footnote{\url{github.com/google-research-datasets/paws}} stands for `Paraphrase Adversaries from Word Scrambling' and \citet{paws}'s presented dataset contains over 108,463 well-formed paraphrase and non-paraphrase pairs with high lexical overlap. \texttt{PAWS-Wiki} and \texttt{PAWS-QQP} can be regarded as the gold standard for the paraphrase recognition task since all of their supervised samples are based on human judgements. For training an encoder-decoder model for paraphrasing, only the true-labelled sentence pairs from each of these datasets are considered.
+
+\section{Conclusion}
+In Intermediate Reports 1 and 2, we have explained our classification test-bench and the collection of data augmentation techniques that we have proposed and implemented. Our codebase is publicly available at \url{github.com/sayarghoshroy/Augment4Gains}.
+
+In our final deliverable, we will present all of our experimental results illustrating the performance of each data augmentation technique on the downstream task of hate-speech detection.
+
+\bibliographystyle{acl_natbib}
+\bibliography{emnlp2020}
+\end{document}

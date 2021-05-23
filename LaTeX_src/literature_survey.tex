@@ -1,0 +1,89 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{emnlp2020}
+\usepackage{times, graphicx}
+\usepackage{latexsym}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{inconsolata}
+
+\makeatletter
+\newcommand{\printfnsymbol}[1]{
+  \textsuperscript{\@fnsymbol{#1}}
+}
+\makeatother
+
+\aclfinalcopy
+\def\aclpaperid{0}
+
+\setlength\titlebox{5cm}
+
+\newcommand\BibTeX{B\textsc{ib}\TeX}
+
+\title{{\small Social Computing Project: Literature Survey} \vspace{0.1cm} \\ Data Augmentation for Hate Speech Detection}
+
+\author{Sayar Ghosh Roy\thanks{\ \ Equal contribution. Order determined by roll number.} \\ \texttt{20171047} \And
+        Souvik Banerjee\footnotemark[1] \\ \texttt{20171094} \And
+        Saujas Vaduguru\footnotemark[1] \\ \texttt{20171098} \And
+        Ujwal Narayan\footnotemark[1] \\ \texttt{20171170}}
+
+\date{}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+In this survey, we provide a brief overview of the existing literature in the area of hate speech detection. We also review a collection of data augmentation techniques which have been applied to various related Natural Language Processing tasks. We then look at approaches to solve hate speech detection that use data augmentation methods.
+
+\section{Automated Hate Speech Detection}
+In this section, we will touch upon a variety of methods and procedures applied in attempts to solve the problem of hate speech detection. There are multiple definitions of hate speech in the existing literature. For our task, we stick to the one \href{https://www.un.org/en/genocideprevention/documents/UN Strategy and Plan of Action on Hate Speech 18 June SYNOPSIS.pdf}{provided by the United Nations}. Early approaches towards detection of hate speech using Bag-of-Words (BoW) models \cite{Kwok2013LocateTH} typically lead to a high number of false positives and suffer from data sparsity issues. In order to deal with the large number of false positives, efforts were made to better characterize and understand the nature of hate speech itself. This led to the formation of finer distinctions between the types of hate speech \cite{wang2014cursing}; in that, hate speech was further classified into `profane' and `offensive'. Features such as $n$-gram graphs \cite{phdthesis} or part of speech (POS) features \cite{chen2012detecting} were also incorporated into the classification models leading to an observable rise in the prediction scores. 
+
+Later approaches used better representations of words and sentences by utilizing semantic vector representations such as word2vec \cite{mikolov2013distributed} and GloVe \cite{pennington2014glove}. These approaches outshone the earlier BoW approaches as concepts with similar meanings are located closer together in the embedding space and thus, these models could deal with lexical items which were unseen during training. Thus, these continuous and dense representations replaced the earlier binary features resulting in a more effective encoding of the input data. Support Vector Machines (SVMs) with a combination of lexical and parse tree-based features have been shown to perform well for detecting hate speech as well \cite{chen2012detecting}.
+
+The recent trends in deep learning led to better vector representations of sentences. With RNNs, it became possible to model variable-length sequences of text. Gated RNNs such as LSTMs \cite{sutskever2014sequence} and GRUs \cite{chung2014empirical} made it possible to better represent long term dependencies. This boosted classification scores, with LSTM and CNN-based models significantly outperforming character and word based N-gram models \cite{badjatiya2017dlhate}. Character-based modelling with CharCNNs \cite{zhang2015character} has been applied for hate speech classification. These approaches particularly shine in cases where the offensive speech is disguised with symbols like `*', `\$' and so forth \cite{character-abuse}.
+
+More recently, attention based approaches like Transformers \cite{vaswani2017attention} have been shown to capture contextualized embeddings for a sentence. Approaches such as BERT \cite{devlin2018bert} which have been trained on massive quantities of data allow us to generate robust and semantically rich embeddings which can then be used for downstream tasks including hate speech detection. Transformer networks pretrained on large multilingual corpora including mBERT \cite{devlin2018bert}, XLM \cite{xlm}, and XLM-RoBERTa \cite{xlmr} have also proved useful for the task of detection and fine-grained classification of hateful content across a set of languages \cite{hasoc-sayar}. Recent ideas around task adaptive pretraining of Transformers \cite{tapt} before utilizing them for classification tasks has also proven useful for the task of hostility detection in text \cite{tapt-tathagata}. 
+Explanations by annotators can also be leveraged to improve hate speech detection \cite{mathew2020hatexplain}. Tokens in the rationale of why the post is classified as hate speech are given the value 1 and the rest of the tokens are marked as 0. This is then averaged over all annotators and passed through a softmax function to create the ground truth attention. This ground truth attention is then used to provide attention supervision to attention based approaches such BERT or BiRNN + Attention. 
+
+Hate speech detection can also be formulated in a multi-label setting based on the type of hate speech (obscene, toxic etc) or in a multi-class setting based on the severity (highly toxic, moderately toxic, not toxic, etc.). Adaptation approaches such as Multilabel-kNN \cite{zhang2007ml} or HARAM \cite{7395756} have shown promise with multi-label hate speech detection \cite{mollas2020ethos}.
+
+There have also been a variety of open or shared tasks to encourage research and development in hate speech detection. The TRAC shared task on aggression identification \cite{ws-2018-trolling} included both English and Hindi Facebook comments. Participants had to detect abusive comments and distinguish between overtly aggressive comments and covertly aggressive comments. OffensEval (SemEval-2019 Task 6) \cite{zampieri-etal-2019-semeval} was based on the Offensive Language Identification Dataset (OLID) containing over 14,000 tweets. This SemEval task had three subtasks: discriminating between offensive and non-offensive posts, detecting the type of offensive content in a post and identifying the target of an offensive post. At GermEval \cite{germeval-task-2}, there was a task to detect and classify hurtful, derogatory, or obscene comments in the German language. Two sub-tasks were continued from their first edition, namely, a coarse-grained binary classification task and a fine-grained multi-class classification problem. As a novel sub-task, they introduced the binary classification of offensive tweets into explicit and implicit.
+
+There have been some efforts to construct lexicons for the purpose of aiding the task of hate speech detection. Hurtlex, a multilingual lexicon of hurtful words created by expert annotators leveraging inputs from linguists has proven useful for detecting hate against immigrants and misogyny in tweets \cite{hurtlex}. This resource is available publicly\footnote{\ \url{github.com/valeriobasile/hurtlex}}. In further experiments, these features were utilized in form of lexicon-based encodings at the sentence-level and as word-level embeddings to improve over baseline BERT models \cite{hurtbert}.
+
+The escalation in derogatory posts on the internet has prompted certain agencies to make toxicity detection modules available for web developers as well as for the general public. A notable work in this regard is Google's Perspective API\footnote{\ \url{www.perspectiveapi.com}} which uses machine learning models to estimate various metrics such as `toxicity', `insult', `threat', etc., given a span of text as input.
+
+A majority of the publicly available datasets on hate speech detection have tweets as their primary data source. \citet{hate-data} review a collection of abusive language datasets focusing on their creation, content, and impact. Their reviewed collection is well maintained and openly accessible\footnote{\ \url{hatespeechdata.com}}. \citet{benchmark} present two fully-labeled large-scale hate speech intervention datasets collected from Gab and Reddit which provide conversation segments, hate speech labels, as well as intervention responses. Due to the choice of their platforms, the data language style is different from that of tweets and in that, is more grammatical and structurally sound.
+
+\section{Data Augmentation}
+Data augmentation is the process of adding additional samples to the training set to encourage a machine learning model to learn generalisable patterns instead of superficial features that are specific to the training data \cite{jha2020does}. The method has found great success in the computer vision community, and has been used as a part of the training process since the earliest approaches to image classification using deep learning \cite{AlexNet}. However, while simple transformations like cropping, tilting, and flipping an image work well for augmenting data in vision tasks, language tasks pose a much stronger challenge due to the strong interdependency of syntactic and semantic features in text data \cite{liu-etal-2020-data}.
+
+There have been a variety of approaches to data augmentation for language tasks. These approaches range from simple meaning-agnostic perturbations of the training data to approaches based on conditional language generation which can generate entirely new sentences. Here, we review approaches to augmenting data for training text classification models, as this is the principal paradigm for hate speech detection tasks.
+
+\citet{wei-zou-2019-eda} present a method called Easy Data Augmentation (EDA), where they propose a set of simple transformations that can be applied to generate perturbed samples with the same label. They study replacing words with synonyms (from WordNet \cite{WordNet}) at random, and randomly inserting, deleting, or swapping words. They find that even such simple transformations provide gains in performance on benchmark datasets, while also ensuring that the transformations do not inadvertently cause label changes frequently.
+
+\citet{wang-yang-2015-thats} use word embedding similarity to replace a word with similar words. They replace words with one of the their $k$ nearest neighbours in the word embedding space. They apply this approach to a text classification task on Twitter data.
+
+While synonym replacement in prior work was performed agnostic to the context of the word, \citet{kobayashi-2018-contextual} propose a method to substitute words based on the predictions of a language model obtained based on the left and right context of the word. This allows for contextual information to be incorporated into the augmentation process.
+
+While most of the above approaches transform sentences in the training data to obtain new sentences with the same class label, \citet{liu-etal-2020-data} propose a reinforcement learning approach that fine-tunes pretrained conditional language models to generate new samples for each class. Their reward model for generation incorporates rewards for words that are closely associated with a particular label, and for fluency as determined by the pretrained language model. They validate the effectiveness of their generation on benchmark classification tasks, and the quality of the generated data with human evaluations.
+
+\citet{xu-etal-2020-data} perform a systematic comparison of various approaches to data augmentation for text classification, emphasising the importance of data augmentation in cases where the number of samples of each label is not balanced. They investigate approaches that add no additional data like resampling from the existing data, word-level transformations (EDA), sequence-to-sequence generation, and generation with variational autoencoders (VAE) \cite{kingma2014autoencoding}. They compare all the approaches on the same tasks under the same setting, providing a direct comparison of the methods. They find that augmentation with VAE consistently provides improvements in performance, and is the best performing approach in most tasks. They also investigate the problem of the amount of generated data that is used, and find that there is a point of extremum for each task which provides the highest performance, beyond which point augmentation becomes detrimental.
+
+To elaborate on VAE in a more mathematical sense, it is a probabilistic framework which finds an efficient approximate ML or MAP estimation of given parameters that shape the distribution of i.i.d data samples, and an efficient approximate posterior inference of a latent variable implied by given observed values. In order to fulfill these objectives, \citet{kingma2014autoencoding} provide a lower bound for the likelihoods in question and derives a loss function that interprets a KL-divergence term as regularizer. Moreover, an algorithm on how to update the parameters during training (auto-encoding VB algorithm) is provided.
+
+\section{Data Augmentation for Hate Speech Detection}
+A straightforward way of tackling the problem of hate-speech detection would involve a supervised approach that heavily depends on labeled datasets for training, which turns out to be a challenge. Existing hate speech datasets are highly imbalanced, as shown by \citet{davidson2017automated}.
+The researchers manually annotated a large Twitter corpus to differentiate offensive tweets from hate tweets. However less than 12\% of the total data was labeled as hateful. Thus, it becomes necessary to perform data augmentation before carrying out any neural network-based training for hate speech detection.
+
+\citet{aug2prev} conduct the first study of data augmentation methods for the task of hate speech detection. They present three methods of data augmentation, in combination with methods to harness deep learning approaches to perform better hate speech detection. These approaches are called \textit{ThreshAug}, \textit{PosAug}, and \textit{GenAug} respectively. \textit{ThreshAug} performs word substitution with words that have embeddings with a cosine similarity above a fixed threshold. \textit{PosAug} shifts and warps tokens within a padded sequence to provide additional samples with the same syntax and semantics. \textit{GenAug} uses an RNN-based language model trained on the data belonging to a specific class to generate additional samples of that class. They find that \textit{ThreshAug} and \textit{PosAug} improve the performance of their detection models, but do not see benefits with \textit{GenAug}, which they attribute to the simplicity of the approach, and the small size of the training data used to train the language models from scratch.
+
+One effective method for such data augmentation is proposed by \citet{cao-lee-2020-hategan}. Their model named \textsf{HateGAN} adopts a reinforcement learning based generative adversarial network architecture to generate hate speech for data augmentation. The discriminator is trained to guide the generator to synthesize tweets that are indistinguishable from the real tweets. Since the end goal is to use the generated tweets for hate speech detection, it utilises a metric which rewards the hateful sentiment of the tweets. Therefore, a pretrained toxicity scorer quantifies the hatefulness of the synthesized tweets as hate scores. The synthesized tweets are also scored with respect to how `realistic' they are. Subsequently, the realistic scores and hate scores are used as rewards to guide and update the parameters in the generator for more realistic hateful Tweet generation. Moreover, the model is trained with policy gradient to overcome the problem of differentiation in sequence generation.
+
+Delving somewhat deeper into the model, the architecture consists of a word embedding layer followed by a LSTM, topped off with a fully connected layer. The LSTM layer is made up of two stacked LSTM sequences. Maximum and average pooling operations are applied to all hidden states of the second LSTM layer. The two vectors are connected to a fully connected layer to generate the final vector for multilabel classification into six polarities: `toxicity', `obscene', `threat', `insult', `identity attack', and `sexually explicit'.
+As for the generator, it adopts a sequence generation framework where reinforcement learning and monte carlo search is utilized. The discriminator here is a binary classifier trained to evaluate the `realisticness'
+of the generated sentence. The discriminator weights are optimized to distinguish the generated tweets from the real ones.
+
+\bibliographystyle{acl_natbib}
+\bibliography{emnlp2020}
+
+\end{document}

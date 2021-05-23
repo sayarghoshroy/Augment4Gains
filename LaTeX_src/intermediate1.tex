@@ -1,0 +1,199 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{emnlp2020}
+\usepackage{times, graphicx}
+\usepackage{latexsym}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{ragged2e}
+\usepackage{blindtext}
+\usepackage{enumitem}
+
+\makeatletter
+\newcommand{\printfnsymbol}[1]{
+  \textsuperscript{\@fnsymbol{#1}}
+}
+\makeatother
+
+\aclfinalcopy
+\def\aclpaperid{0}
+
+\setlength\titlebox{5cm}
+
+\newcommand\BibTeX{B\textsc{ib}\TeX}
+
+
+\newcommand\Warning{%
+ \makebox[1.4em][c]{%
+ \makebox[0pt][c]{\raisebox{.1em}{\small!}}%
+ \makebox[0pt][c]{\Large$\bigtriangleup$}}}%
+
+\title{{\normalsize Social Computing Project: Intermediate Report 1} \vspace{0.18cm} \\ Data Augmentation for Hate Speech Detection}
+
+\author{Sayar Ghosh Roy\thanks{\ \ Equal contribution. Order determined by roll number.} \\ \texttt{20171047} \And
+        Souvik Banerjee\footnotemark[1] \\ \texttt{20171094} \And
+        Saujas Vaduguru\footnotemark[1] \\ \texttt{20171098} \And
+        Ujwal Narayan\footnotemark[1] \\ \texttt{20171170}}
+
+\date{}
+\begin{document}
+\maketitle
+
+\Warning This document contains samples of online social media hate speech which are present in the publicly available datasets we are currently studying. These are included for illustrative purposes only and in no way reflect the views of the authors. Please note that these samples are highly derogatory. Reader discretion is advised.
+
+\vspace{4mm}
+\hrule
+\vspace{4mm}
+
+In this document, we describe the progress made by 15\textsuperscript{th} March, 2021, and sketch our plans for the rest of the project. Our work so far falls along three axes:
+\begin{enumerate}
+    \item Developing a common experimental pipeline to have a uniform mode of training and evaluating models using different augmentation methods
+    \vspace{-0.28cm}
+    \item Reproducing baselines from prior work
+    \vspace{-0.28cm}
+    \item Improving over baselines using modified baselines or novel methods
+\end{enumerate}
+
+\section{Experimental pipeline}
+In this section, we describe our overall test-bench for evaluating our data augmentation strategies. Our code is publicly available at \url{https://github.com/sayarghoshroy/Augment4Gains/}.
+
+\subsection{Dataset}
+The language in use on Twitter is in a different text style as compared to day-to-day speech, formally written articles, and web-pages. The Twitter platform’s style of text is full of emojis, smileys, hashtags, acronyms, abbreviated forms of words and phrases, orthographic deviations from standard forms including dropping of vowels from certain words, and instances of code mixing. Most of the publicly available datasets for hate speech detection are composed of Tweets. Since our augmentation approaches rely on both lexical and semantic cues, we require a data-source containing grammatical text that is more in-line with standard English language style.
+
+In such a setting, we consider \citet{benchmark}. Their dataset contains posts which are scraped from the Reddit\footnote{\url{www.reddit.com}} and Gab\footnote{\url{gab.com}} platforms and are much more structurally sound as compared to Tweets. The dataset contains human annotated counter narratives specific to particular comment threads. In addition, they provide a list of indices of comments which contains instances of hate. We extract each user response in every post from these datasets separately and lookup the corresponding indices list to assign a binary label to every single user response, namely 1 for hateful, offensive or derogatory and 0 for otherwise. Each response, composed of multiple sentences is thus one datapoint.
+
+As a pre-processing step, we remove information such as hashtags, mentions, URLs, emojis, etc. from every datapoint. We only leverage the cleaned text without any additional features for our augmented sample generation and classification tasks. For each dataset, we randomly divided the data in a 70:10:20 ratio (as done in \citet{benchmark}) into training, validation and testing splits (following the decision). Our processed Reddit dataset contains 15619 train samples, 2231 validation samples, and 4464 test samples while the processed Gab dataset carries 23643, 3377, and 6756 samples for training, validation, and testing respectively.
+
+For our final report, we will include a third dataset based on Tweets\footnote{\url{twitter.com}}. Although our augmentation approaches are designed keeping standard English language text in mind, we will evaluate how each of these techniques work out on cleaned Tweet texts. Throughout this and further documents, we will refer to our three datasets as simply, Data$_{Reddit}$, Data$_{Gab}$, and Data$_{Twitter}$.
+
+\subsection{Classification Model}
+
+Fine-tuning of pre-trained Transformer models such as BERT \cite{devlin2018bert} and RoBERTa \cite{roberta} are becoming the new baseline for various tasks in the Natural Language Processing domain. For evaluating our data augmentation approaches, we utilize a pre-trained Transformer-based model (such as BERT or RoBERTa) as a text encoder paired with a Multi-Layer Perceptron (MLP) classifier head that considers the final-layer output embedding of the \texttt{[CLS]} token. We utilize the Adam optimizer to train our classification architecture for a total of 8 epochs and save the model weights corresponding to the point in training that manifested the least validation loss.
+
+One way of dealing with class imbalance in the base as well as the augmented datasets is to weigh each class differently during training.
+
+\begin{itemize}
+    \itemsep-0.3em
+    \item $N_p = $ \# positive samples in training
+    \item $N_n = $ \# negative samples in training
+    \item $N = max(N_p,\ N_n)$
+\end{itemize}
+
+We set the weights of the positive and negative classes as $\frac{N}{N_p}$ and $\frac{N}{N_n}$ respectively. We implement the option of weighing terms in the classifier loss accordingly to observe the effects of class imbalance.
+
+% This approach for dealing with class imbalance has worked out well in our existing tests yielding significant performance gains and we thus uniformize this normalization across all of our experiments.
+
+\subsection{Classification test bench}
+
+We require a uniform scheme of evaluating all of our augmentation approaches. Therefore, for each dataset under consideration (be it Data$_{Reddit}$, Data$_{Gab}$, or Data$_{Twitter}$), we lock the validation and the testing data. All the augmented examples are based solely on the training samples. This is to ensure that there is no seepage of information and as such, the classification models do not indirectly look at some modified version of a test (or validation) sample.
+
+Every augmentation method can be viewed as an algorithm that takes in a sample of text as input conditioned on which one or more revamped samples are produced. In our pipeline, the in-question augmentation procedure is applied to all the training datapoints. The generated samples are appended to the existing training split resulting in the augmented train data-frame. The classification test-bench utilizes the newly created training set, taking care of the downstream steps. 
+
+\section{Baselines}
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+    \toprule
+        \textbf{Original} & \textbf{EDA} & \textbf{ThreshAug}  \\
+    \midrule
+        % "main_index": 916
+        you should watch louis le vau 's latest video . steven oh of tyt is disturbing as hell and makes me hope that jimmy dore wakes the left up . & you should watch louis le vau s latest video steven oh of tyt is disturbing take go out as hell and makes me hope that jimmy dore wakes the left up   &
+        you should watch liam le vau's latest youtube . steven ooh of tyt is disturbing as shit and makes me hope that bruce dore wakes the left up.
+
+        \\ \midrule
+        % "main_index": 3663
+        kill yourself you whiny , self-righteous faggot . & kill yourself you whiny ego righteous faggot &  let yourself you whiny, self-absorbed fag.
+\\ \midrule
+        % "main_index": 3703
+        but why do they make that face & but why do they shuffle that face & but why do they make that look
+ \\
+    \bottomrule
+    \end{tabular}
+    \caption{Some samples from the training set, along with corresponding augmented versions with EDA methodology and \textit{ThreshAug} (Glove-50 + POS + cosine similarity).}
+    \label{tab:aug_examples}
+\end{table*}
+
+\subsection{Easy Data Augmentation}
+While there are a variety of techniques involved in data augmentation for text classification tasks, one of the most easiest yet surprisingly performant one is the Easy Data Augmentation (EDA) method \cite{wei-zou-2019-eda}. EDA consists of the following four basic operations. 
+
+\begin{itemize}
+\item \textbf{Synonym Replacement (SR)}: Here $n$ randomly selected words are replaced with one of it's synonyms chosen at random. These synonyms are generated by querying WordNet \cite{WordNet}, however it's important to note here that for synonym replacement all the senses of the word are considered and not just the sense it is currently being used in. 
+\item \textbf{Random Swap (RS)}: Here two words are randomly chosen from the sentence and their positions are swapped. This operation is repeated $n$ times
+\item \textbf{Random Deletion (RD)}: Here each word of the sentence is randomly removed with the probability $p$
+\item \textbf{Random Insertion (RI)}: Here a randomly synonym of a randomly selected word is inserted randomly into the sentence. This operation is then repeated $n$ times 
+\end{itemize}
+
+For the synonym specific operations i.e. RI and SR only content words are chosen and the stop words are ignored. While the methods are simplistic and do not lead always lead to generation of high quality grammatically correct data, they produce significant performance boosts. \citet{wei-zou-2019-eda} also observe the newly generated sentences occupy positions closely around the original sentences in the latent semantic space and thus the meaning and therefore the labels do not significantly change. For operations such as SR, RI and RS, in order to prevent the new sentences from being too noisy we formulate $n$ to be dependent on the length of the sentence $l$, given by $n = \alpha l $ where $\alpha$ indicates the percentage of the sentence that will be modified. Other than these hyper-parameters, we also cap the number of generated sentences per source sentence with a parameter $n_{aug}$ so as to avoid pollution of the source data. 
+
+\subsection{Synonym substitution}
+In order to make relevant substitutions of words with synonyms without using tools external to neural networks (such as a thesauraus, etc.), we make use of pre-trained word embeddings (GLoVe in our actual implementation). These embeddings allow us to determine the relative similarity between each word in the vocabulary space of a text corpus. Now the question remains about which words to substitute. A substitution is
+determined by two factors. Firstly, any potential replacement word
+must exceed the cosine distance threshold $t$, where $t \in  [0, 1]$ and it
+must match the POS-tag assigned to the word. The intuition behind the inclusion of both the above requirements is that two words must have been seen in sufficiently equal contexts such that one can be
+replaced with the other without changing the sentence semantics. We follow \citet{aug2prev} and use POS tags to choose words of only very specific tags like common nouns, adjectives and verbs. This method, termed \textit{ThreshAug} forms a baseline for the synonym replacement approaches we explore.
+
+\section{Improvements}
+\subsection{Contextual synonym substitution}
+\citet{aug2prev} propose a way to use word embeddings to identify suitable synonyms to substitute in augmented samples. However, words can have multiple senses, and word embeddings do not provide a way to distinguish which sense is being used based on words in the context \cite{arora-etal-2018-linear}. We have explored two directions in incorporating context information into the choice of synonyms for replacement. The first relies on contextual word representations, and the second relies on incorporating contextual knowledge into choosing replacements from a lexical database.
+
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+    \toprule
+        \textbf{Original} & \textbf{MLM} & \textbf{WSD+WordNet}  \\
+    \midrule
+        % "main_index": 916
+        you should watch louis le vau 's latest video . steven oh of tyt is disturbing as hell and makes me hope that jimmy dore wakes the left up . & you should enjoy louis le vau's bloody claudius. steven oh of tyt is disturbing as hell and makes me wish that heather dore wakes the wolf up. &
+        you should enjoy louis le vau's bloody claudius. steven oh of tyt is disturbing as hell and makes me wish that heather dore provokes the left up.
+        \\ \midrule
+        % "main_index": 3663
+        kill yourself you whiny , self-righteous faggot . & save yourself you whiny cold self - righteous faggot. & kill yourself you complaining , self-righteous faggot . \\ \midrule
+        % "main_index": 3703
+        but why do they make that face & but why do they make their face & but why do they make  that visage \\
+    \bottomrule
+    \end{tabular}
+    \caption{Some samples from the training set, along with corresponding augmented versions with MLM-based augmentation and WSD+WordNet-based augmentation.}
+    \label{tab:aug_examples}
+\end{table*}
+
+\subsubsection{Contextual word representations}
+With the advent of contextualized word representations \cite{peters-etal-2018-deep,devlin2018bert}, we have access to methods that can compute word embeddings that can allow for sense disambiguation based on context.
+
+\citet{kobayashi-2018-contextual} propose using contextual embeddings in the data augmentation pipeline for text classification tasks. Similar to \citet{aug2prev}, who select words for substitution and determine the alternatives using word embedding similarity, \citet{kobayashi-2018-contextual} select words to substitute, and use a bidirectional language model to choose the word to be substituted. The intuition behind their method is that a language model is likely to choose synonyms as alternatives, and these choices are made with the context in consideration, resulting in a more informed augmentation technique.
+
+Using the language model, they obtain the distribution $p(w_i'|S \setminus \{w_i\})$, where $S$ is the sample, $w_i$ is the word chosen for substitution, and $w_i'$ is the alternative word. Then, they sample from the distribution $p(w_i'|S \setminus \{w_i\})^{\frac{1}{\tau}}$, which is the distribution predicted by the model annealed with a temperature. The temperature hyperparameter allows us to control the strength of the augmentation, with smaller values more faithfully choosing the most likely words, and larger values allowing the model to choose lower probability words more often resulting in more diverse augmented samples.
+ 
+Since the publication of \citet{kobayashi-2018-contextual}, there have been significant strides in large, pretrained language models. In this project, we explore the use of these large pretrained models to perform augmentation in a similar way. The formulation put forth by \citet{kobayashi-2018-contextual} naturally lends itself to the masked language modelling (MLM) task, which is used as the pretraining task for Transformer-based language models (TLMs) \cite{devlin2018bert}.
+
+We use the MLM task to generate synonyms for augmentation. We choose whole words (as opposed to tokens in the TLM vocabulary, which tend to be subwords) with a fixed probability, and replace these words in the data with the \texttt{[MASK]} token. We then pass these to a TLM with the MLM head, and obtain the distribution over tokens that can fill the \texttt{[MASK]} token. This distribution, which is equivalent to $p(w_i'|S \setminus \{w_i\})$, is then used to sample replacements and obtain augmented samples. We will choose the temperature value for sampling based on downstream performance on the classification task.
+
+\subsubsection{WordNet-guided synonym substitution with word sense disambiguation}
+
+Words can often have multiple meanings. Thus when augmenting synonyms it becomes important to identify the right sense of the word so that the right synonyms of that word can be found. This problem of finding the correct sense of a word in text is termed as ``Word Sense Disambiguation''. While the problem is often termed as an AI complete problem, recent work utilising Deep Neural Networks have made significant headway into it. Transformers such as BERT \cite{devlin2018bert} have given state of the art results on many NLP tasks and this task is no different. We follow  the approach  of \citet{yap-etal-2020-adapting}, where both BERT and WordNet \cite{WordNet} are leveraged to find the right sense of the word. 
+
+	We first need to identify the right phrases to substitute or replace and thus we chunk the sentence. Once the sentence is split into multiple chunks, we check if that particular chunk is present in WordNet . If it is present, we then leverage BERT to rank all the senses of the word in the context of the sentence. We pick the sense with the highest rank as the correct sense of the word. If the chunk is not present in WordNet , we back-off and search through all the words of the chunks individually and repeat the process we mentioned earlier to identify the sense of the word. Once we found the right sense of the word, we query WordNet again to retrieve the set of synonyms and hypernyms associated with the particular word or phrase. Once we have the synonyms, we substitute these synonyms in-place of the original word or phrase to generate new samples for training. 
+
+\section{Next steps}
+As discussed with our mentor, we used this time to perform small exploratory studies and we will run full experiments and present results in future deliverables.
+
+So far, we have focused on alteration-based approaches to data augmentation. Another dimension we hope to explore for the upcoming deliverables is using generation-based approaches to augmentation. We also plan to further improve and vary the alteration-based approaches we have experimented with so far.
+
+\subsection{Contextual synonym substitution}
+
+One important challenge in the contextual synonym substitution method is the incorporation of class information in the augmentation process. This is a step towards ensuring that the model does not choose words that change the label as alternatives to words in the original data.
+ 
+\citet{kobayashi-2018-contextual} propose a method for class conditional replacement prediction with bidirectional LSTM language models. They fine-tune their model on the original training data for the task to predict $p(w_i'|S\setminus\{w_i\}, y)$, where $y$ is a label embedding that allows the model to learn the correlation between labels and word choice.
+
+We are in the process of exploring ways of modifying the MLM head for the TLMs that we use to incorporate class information, and hope to have a data augmentation model that can incorporate class information for augmentation.
+
+Another avenue we hope to explore is determining what types of words we choose to mask based on linguistic criterion like part-of-speech information. We are currently working on this, and hope to present results in the next deliverable.
+
+\bibliographystyle{acl_natbib}
+\bibliography{emnlp2020}
+\end{document}
