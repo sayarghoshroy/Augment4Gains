@@ -1,6 +1,18 @@
 # Augment4Gains
 
-#### Enhancing Hate Speech Detection through Data Augmentation Techniques 💪
+### Enhancing Hate Speech Detection through Data Augmentation Techniques 💪
+
+<p align="center">
+  <img src="https://github.com/sayarghoshroy/Augment4Gains/blob/main/illustrations/pipeline.png" width="60%">
+</p>
+
+### Augmentation Methods
+
+<p align="center">
+  <img src="https://github.com/sayarghoshroy/Augment4Gains/blob/main/illustrations/mind_map.png" width="85%">
+</p>
+
+---
 
 - Processed Datasets with Train, Validation, and Test splits can be found [here](https://drive.google.com/drive/folders/13zFCdnfLcJde0Wd1NDp5lDVXiEmgaRRs?usp=sharing).
 
