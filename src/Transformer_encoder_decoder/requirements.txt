@@ -1,5 +1,5 @@
 transformers==4.30.0
-torch==1.1.0
+torch==1.13.1
 tqdm==4.49.0
 nltk==3.4
 sentencepiece==0.1.92
